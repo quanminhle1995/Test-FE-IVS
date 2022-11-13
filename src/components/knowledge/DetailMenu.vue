@@ -65,8 +65,11 @@
         <div class="knowledge-keyword">
           <ul>
             <li>
-              <span>キーワード</span>
-              <span class="highlight">契約書</span>
+              <span>キーワード 13123</span>
+              <Dropdown
+                :list="dataKeyWord"
+                v-model="knowledge.keyword"
+              ></Dropdown>
             </li>
             <li>
               <span>含まないキーワード</span>
@@ -137,22 +140,29 @@
       <button @click="save">フィルターを更新</button>
       <div
         class="switch-simple-search open-simple-menu"
-        @click="openSimpleMenu"
+        @click="showSimpleMenu = true"
       >
         <IconSwap class="open-simple-menu"></IconSwap>
         <span class="open-simple-menu">簡易検索に切り替え</span>
       </div>
     </div>
   </div>
+  <SimpleMenu
+    v-if="showSimpleMenu"
+    @close="showSimpleMenu = false"
+    type="update"
+    v-model="knowledge"
+  ></SimpleMenu>
 </template>
 <script setup lang="ts">
-import { reactive } from "vue";
+import { reactive, ref, watch } from "vue";
 import RadioButton from "@/components/elements/RadioButton.vue";
 import InputSwitch from "@/components/elements/InputSwitch.vue";
 import IconSwap from "@/components/icons/IconSwap.vue";
 import Tag from "@/components/elements/Tag.vue";
 import { useKnowledgeStore } from "@/stores/knowledge";
 import Dropdown from "@/components/elements/Dropdown.vue";
+import SimpleMenu from "@/components/knowledge/SimpleMenu.vue";
 import { storeToRefs } from "pinia";
 export interface ISettings {
   type?: number;
@@ -166,26 +176,27 @@ export interface ISettings {
 export interface PropSettings {
   index: number;
   settings: ISettings | any;
+  boardName: string;
 }
 const props = withDefaults(defineProps<PropSettings>(), {
   settings: {
     type: 0,
     source: "murakami",
     tag: false,
-    keyword: false,
+    keyword: "matsumoto",
     dateTimeDesignation: "",
     likeCount: 0,
     favorite: false,
   },
 });
 const store = useKnowledgeStore();
-const { openSimpleMenu, updateSettingsBord  } = store;
-const { dataSource } = storeToRefs(store);
-
-const emits = defineEmits(["saveSettings", "closeDetailMenu"]);
+const { updateSettingsBoard } = store;
+const { dataSource, dataKeyWord } = storeToRefs(store);
+const emits = defineEmits(["closeDetailMenu", "onChange"]);
 const { type, source, tag, keyword, dateTimeDesignation, likeCount, favorite } =
   props.settings;
 const knowledge = reactive({
+  boardName: props.boardName,
   type: type,
   source: source,
   tag: tag,
@@ -195,16 +206,17 @@ const knowledge = reactive({
   favorite: favorite,
 });
 
+const showSimpleMenu = ref(false);
 const handleRemoveTag = (e: Event) => {
   console.log(e);
 };
-
 const save = () => {
-  updateSettingsBord(props.index, knowledge);
-  emits("saveSettings", knowledge);
+  updateSettingsBoard(props.index, knowledge);
   emits("closeDetailMenu");
 };
-
+watch(knowledge, () => {
+  emits("onChange", knowledge);
+});
 </script>
 
 <style scoped lang="scss">
@@ -284,7 +296,10 @@ const save = () => {
     gap: 5px;
   }
 }
+.simple-menu {
+  right: -100%;
+  z-index: 1;
+  width: 96%;
+  top: -77px;
+}
 </style>
-
-function useKnowledgeStore() { throw new Error("Function not implemented."); }
-function useKnowledgeStore() { throw new Error("Function not implemented."); }

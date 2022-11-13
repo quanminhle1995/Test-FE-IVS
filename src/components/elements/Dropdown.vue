@@ -1,6 +1,6 @@
 <template>
   <div class="dropdown" ref="dropdown">
-    <span class="value-select" @click="handleShowItems">{{showName}}</span>
+    <span class="value-select" @click="handleShowItems">{{showName ? showName : '設定なし'}}</span>
     <div class="list-item" v-if="showListItem">
       <ul>
         <li class="title" @click="showListItem = false">メンバーを検索</li>

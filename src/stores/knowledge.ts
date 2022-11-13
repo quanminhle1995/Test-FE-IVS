@@ -1,10 +1,17 @@
-import { ref, computed } from "vue";
+import { ref, computed, reactive } from "vue";
 import { defineStore } from "pinia";
 
 export const useKnowledgeStore = defineStore("knowledge", () => {
-  const showSimpleMenu = ref(false);
-  const listBord = ref<any[]>([]);
+  const listBoard = ref<any[]>([]);
   const listPosts = ref<any[]>([]);
+  const dataSimpleMenu = ref<any>({
+    index: null,
+    tag: null,
+    type: null,
+    source: null,
+    keyword: null,
+    boardName: null
+  });
 
   //dummy-data
   const dataSource = ref([
@@ -53,24 +60,21 @@ export const useKnowledgeStore = defineStore("knowledge", () => {
       value: "itakura",
     },
   ]);
-  
-  const openSimpleMenu = () => {
-    showSimpleMenu.value = true;
-  };
-  const closeSimpleMenu = () => {
-    showSimpleMenu.value = false;
+
+  const createNewBoard = (board) => {
+    createBoard(board);
+  }
+
+  const getDataBoard = async () => {
+    listBoard.value = lstBoardDummy.value;
+    listPosts.value = lstPostsDummy.value;
   };
 
-  const getDataBord = async () => {
-    listBord.value = lstBordDummy;
-    listPosts.value = lstPostsDummy;
-  };
-
-  const filterDataBord = computed(() => {
-    return listBord.value.map((bord, index) => {
+  const filterDataBoard = computed(() => {
+    return listBoard.value.map((board, index) => {
       return {
-        ...bord,
-        key: `bord-${index}`,
+        ...board,
+        key: `Board-${index}`,
         posts: listPosts.value.filter((item) => {
           return item;
         }),
@@ -78,52 +82,69 @@ export const useKnowledgeStore = defineStore("knowledge", () => {
     });
   });
 
-  const updateSettingsBord = async (index: number, newValue: any) => {
-    return await saveSettingBordToDB(index, newValue).then(() => {
-      const bord = listBord.value.find((bord, i) => i === index);
-      bord.settings = {
+  const updateSettingsBoard = async (index: number, newValue: any) => {
+    return await saveSettingBoardToDB(index, newValue).then(() => {
+      const board = listBoard.value.find((board, i) => i === index);
+      board.settings = {
         ...newValue,
       };
     });
   };
 
   return {
-    showSimpleMenu,
-    openSimpleMenu,
-    closeSimpleMenu,
-    getDataBord,
-    filterDataBord,
-    updateSettingsBord,
+    getDataBoard,
+    filterDataBoard,
+    updateSettingsBoard,
     dataSource,
-    dataKeyWord
+    dataKeyWord,
+    dataSimpleMenu,
+    createNewBoard
   };
 });
 
-export async function saveSettingBordToDB(index: number, newValue: any) {
-  return (lstBordDummy[index].settings = newValue);
+export async function saveSettingBoardToDB(index: number, newValue: any) {
+  return (lstBoardDummy.value[index].settings = newValue);
+}
+
+export async function createBoard(board: any) {
+  const newBoard = {
+    boardName: board.boardName,
+    settings: {
+      type: board.type,
+      source: board,
+      tag: board.tag,
+      keyword: board.keyword,
+      dateTimeDesignation: board.dateTimeDesignation,
+      likeCount: board.likeCount,
+      favorite: board.favorite
+    }
+  };
+  return lstBoardDummy.value.push(newBoard);
 }
 
 //dummy-db
-export let lstBordDummy = [
+export let lstBoardDummy = ref([
   {
-    tag: "All",
-    settings: {},
+    boardName: "All",
+    boardDefault: true,
+    settings: {
+    },
   },
   {
-    tag: "沼尾さんのナレッジ",
+    boardName: "沼尾さんのナレッジ",
     settings: {
       type: 1,
       source: "murakami",
       tag: false,
-      keyword: false,
+      keyword: 'matsumoto',
       dateTimeDesignation: "",
       likeCount: 0,
       favorite: false,
     },
   },
-];
+]);
 
-export let lstPostsDummy = [
+export let lstPostsDummy = ref([
   {
     userName: "numao",
     avatar: "image-dummy.png",
@@ -271,4 +292,4 @@ export let lstPostsDummy = [
       share: 43,
     },
   },
-];
+]);

@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import Knowledge from '@/views/Knowledge.vue';
-import ListBord from "@/components/knowledge/ListBord.vue";
+import ListBoard from "@/components/knowledge/ListBoard.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -16,13 +16,13 @@ const router = createRouter({
       children: [
         {
           path: '',
-          name: 'ListBord',
-          component: ListBord
+          name: 'ListBoard',
+          component: ListBoard
         },
         {
           path: ':filter',
-          name: 'filterListBord',
-          component: ListBord
+          name: 'filterListBoard',
+          component: ListBoard
         }
       ]
     },

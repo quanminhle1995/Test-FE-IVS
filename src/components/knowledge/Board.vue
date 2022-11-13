@@ -1,7 +1,7 @@
 <template>
   <div class="board">
     <div class="header">
-      <span class="filter">#{{ tag }}</span>
+      <span class="filter">#{{ showBoardName }}</span>
       <IconViewmore
         color="#01194B"
         class="detail-menu"
@@ -12,7 +12,9 @@
       v-if="showMenuDetail"
       :index="index"
       :settings="settings"
+      :boardName="showBoardName"
       @closeDetailMenu="showMenuDetail = false"
+      @onChange="handleChangeSettings"
     ></DetaiMenu>
 
     <div class="container">
@@ -31,26 +33,27 @@
 </template>
 <script lang="ts" setup>
 import IconViewmore from "@/components/icons/IconViewmore.vue";
-import { provide, ref } from "vue";
+import { ref } from "vue";
 import type { IPost } from "@/components/knowledge/Post.vue";
 import Post from "@/components/knowledge/Post.vue";
 import DetaiMenu from "@/components/knowledge/DetailMenu.vue";
 export interface PropsBoard {
   index: number,
-  tag: string;
+  boardName: string;
   data: IPost[] | any;
   settings: Object
 }
 const props = defineProps<PropsBoard>();
-provide('dataBord', props);
-const {
-  data: { userName, avatar, note, title, description, thumbnail, interact },
-  tag,
-} = props;
 const showMenuDetail = ref(false);
+const showBoardName = ref(props.boardName);
 const openDetailMenu = () => {
-  showMenuDetail.value = true;
+  showMenuDetail.value = !showMenuDetail.value;
 };
+
+const handleChangeSettings = (dataChange: any) => {
+  showBoardName.value = dataChange.boardName;
+}
+
 </script>
 
 <style scoped lang="scss">

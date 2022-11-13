@@ -1,22 +1,24 @@
 <template>
   <div class="list-post">
-    <Bord v-for="(item, index) in filterDataBord" :key="item.key" :tag="item.tag" :data="item.posts" :settings="item.settings" :index="index"></Bord>
+    <Board v-for="(item, index) in filterDataBoard" :key="item.key" :boardName="item.boardName" :data="item.posts" :settings="item.settings" :index="index"></Board>
   </div>
-  <button class="btn-add-filter open-simple-menu" @click="openSimpleMenu">
+  <button class="btn-add-filter" @click="showSimpleMenu = true">
     +
   </button>
-  <SimpleMenu v-if="showSimpleMenu"></SimpleMenu>
+  <SimpleMenu v-if="showSimpleMenu" @close="showSimpleMenu = false" type="create"></SimpleMenu>
 </template>
 
 <script lang="ts" setup>
-import Bord from "@/components/knowledge/Bord.vue";
+import Board from "@/components/knowledge/Board.vue";
+import {ref} from "vue";
 import { storeToRefs } from "pinia";
 import SimpleMenu from "@/components/knowledge/SimpleMenu.vue";
 import { useKnowledgeStore } from "@/stores/knowledge";
 const store = useKnowledgeStore();
-const { openSimpleMenu, getDataBord, } = store;
-const { showSimpleMenu, filterDataBord} = storeToRefs(store);
-getDataBord();
+const { getDataBoard, } = store;
+const { filterDataBoard} = storeToRefs(store);
+const showSimpleMenu = ref(false);
+getDataBoard();
 </script>
 
 <style scoped lang="scss">

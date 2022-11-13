@@ -1,11 +1,7 @@
 <template>
   <div class="simple-menu" ref="simpleMenu">
     <div class="info">
-      <input
-        placeholder="#タイトルを入力"
-        @change="handleInputFilterName"
-        v-model="filterData.filterName"
-      />
+      <input placeholder="#タイトルを入力" v-model="data.boardName" />
       <div class="options">
         <div class="option">
           <label>カテゴリー</label>
@@ -13,36 +9,30 @@
             <RadioButton
               label="ナレッジ"
               value="0"
-              v-model="filterData.type"
+              v-model="data.type"
             ></RadioButton>
             <RadioButton
               label="投稿シェア"
               value="1"
-              v-model="filterData.type"
+              v-model="data.type"
             ></RadioButton>
             <RadioButton
               label="投稿シェア"
               value="2"
-              v-model="filterData.type"
+              v-model="data.type"
             ></RadioButton>
           </div>
         </div>
         <div class="option">
           <label>ナレッジ元</label>
           <div class="content">
-            <Dropdown
-              v-model="filterData.sourceKnowledge"
-              :list="dataSource"
-            ></Dropdown>
+            <Dropdown v-model="data.source" :list="dataSource"></Dropdown>
           </div>
         </div>
         <div class="option">
           <label>キーワード</label>
           <div class="content">
-            <Dropdown
-              v-model="filterData.keyword"
-              :list="dataKeyWord"
-            ></Dropdown>
+            <Dropdown v-model="data.keyword" :list="dataKeyWord"></Dropdown>
           </div>
         </div>
       </div>
@@ -54,35 +44,42 @@
 </template>
 <script setup lang="ts">
 import RadioButton from "@/components/elements/RadioButton.vue";
-import { reactive, ref } from "vue";
+import { reactive, ref, computed, watch } from "vue";
 import Dropdown from "@/components/elements/Dropdown.vue";
 import { useDetectOutsideClick } from "@/utility/common";
 import { useKnowledgeStore } from "@/stores/knowledge";
+import { storeToRefs } from "pinia";
+const emits = defineEmits(["simpleMenuChange", "close", "update:modelValue"]);
+const props = defineProps(["type", "modelValue"]);
+
 const store = useKnowledgeStore();
-const { closeSimpleMenu, dataKeyWord, dataSource } = store;
-
-const filterData = reactive({
-  filterName: "",
-  type: 0,
-  sourceKnowledge: "murakami",
-  keyword: 'yasuda'
+const { dataKeyWord, dataSource, createNewBoard } = store;
+const data = ref({
+  boardName: "",
+  index: "",
+  tag: "",
+  type: "",
+  source: "",
+  keyword: "",
+  dateTimeDesignation: ""
 });
+
 const simpleMenu = ref<HTMLElement | null>(null);
-
-useDetectOutsideClick(simpleMenu, (e: any) => {
-  console.log(e.target.classList.value);
-  if(!e.target.classList.value.includes("open-simple-menu") && !filterData.filterName) {
-    closeSimpleMenu();
-  } else {
-    saveFilterData();
-  }
-})
-
-const saveFilterData = () => {
-  console.log("save filter data");
+if (props.type === "create") {
+  useDetectOutsideClick(simpleMenu, (e: any) => {
+    if (!!data.value.boardName) {
+      createNewBoard(data.value);
+      emits("close");
+    } else if (!e.target.classList.value.includes("btn-add-filter")) {
+      emits("close");
+    }
+  });
+} else if (props.type === "update") {
+  data.value = props.modelValue;
+  watch(data.value, () => {
+    emits("update:modelValue", data);
+  });
 }
-
-const handleInputFilterName = () => {};
 </script>
 
 <style scoped lang="scss">
