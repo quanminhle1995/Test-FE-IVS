@@ -75,12 +75,21 @@ export const useKnowledgeStore = defineStore("knowledge", () => {
       return {
         ...board,
         key: `Board-${index}`,
-        posts: listPosts.value.filter((item) => {
-          return item;
-        }),
+        posts: filterPosts(board.settings)
       };
     });
   });
+
+  const filterPosts = (condition: any) => {
+    return listPosts.value.filter((item) => {
+      const {type, tag, source, likeCount, keyword, favorite, dateTimeDesignation} = condition;
+      if(!!condition.type) {
+        return (item.type == type && item.favorite === favorite);
+      } else {
+        return item;
+      }
+    })
+  }
 
   const updateSettingsBoard = async (index: number, newValue: any) => {
     return await saveSettingBoardToDB(index, newValue).then(() => {
@@ -116,7 +125,7 @@ export async function createBoard(board: any) {
       keyword: board.keyword,
       dateTimeDesignation: board.dateTimeDesignation,
       likeCount: board.likeCount,
-      favorite: board.favorite
+      favorite: board.favorite || false
     }
   };
   return lstBoardDummy.value.push(newBoard);
@@ -135,7 +144,7 @@ export let lstBoardDummy = ref([
     settings: {
       type: 1,
       source: "murakami",
-      tag: false,
+      tag: "false",
       keyword: 'matsumoto',
       dateTimeDesignation: "",
       likeCount: 0,
@@ -152,6 +161,7 @@ export let lstPostsDummy = ref([
     title: "FY22 キックオフミーティング資料",
     description: "こちらに格納されています。",
     type: 1,
+    favorite: true,
     thumbnail: {
       image: "image-dummy.png",
       link: "https://app.box.com/s/xla8523hewputms10budz3emewcmor",
@@ -169,6 +179,7 @@ export let lstPostsDummy = ref([
     note: "たった今",
     title: "マーケティングで使えるHack",
     type: 2,
+    favorite: true,
     description:
       "良記事を見つけたのでシェア。 https://toyokeizai.net/articles/-/409835",
     thumbnail: {
@@ -188,6 +199,7 @@ export let lstPostsDummy = ref([
     note: "たった今",
     title: "マーケティングで使えるHack",
     type: 0,
+    favorite: false,
     description:
       "良記事を見つけたのでシェア。 https://toyokeizai.net/articles/-/409835",
     thumbnail: {
@@ -208,6 +220,7 @@ export let lstPostsDummy = ref([
     title: "",
     description: "",
     type: 0,
+    favorite: true,
     thumbnail: {
       image: "image-dummy-3.png",
       link: "https://app.box.com/s/xla8523hewputms10budz3emewcmor",
@@ -226,6 +239,7 @@ export let lstPostsDummy = ref([
     title: "",
     description: "",
     type: 0,
+    favorite: true,
     thumbnail: {
       image: "image-dummy-3.png",
       link: "https://app.box.com/s/xla8523hewputms10budz3emewcmor",
@@ -244,6 +258,7 @@ export let lstPostsDummy = ref([
     title: "FY22 キックオフミーティング資料",
     description: "こちらに格納されています。",
     type: 1,
+    favorite: true,
     thumbnail: {
       image: "image-dummy.png",
       link: "https://app.box.com/s/xla8523hewputms10budz3emewcmor",
@@ -261,7 +276,8 @@ export let lstPostsDummy = ref([
     note: "たった今",
     title: "FY22 キックオフミーティング資料",
     description: "こちらに格納されています。",
-    type: 2,
+    type: 3,
+    favorite: true,
     thumbnail: {
       image: "image-dummy-2.png",
       link: "https://app.box.com/s/xla8523hewputms10budz3emewcmor",
@@ -278,7 +294,28 @@ export let lstPostsDummy = ref([
     avatar: "image-dummy.png",
     note: "たった今",
     title: "マーケティングで使えるHack",
+    type: 1,
+    favorite: false,
+    description:
+      "良記事を見つけたのでシェア。 https://toyokeizai.net/articles/-/409835",
+    thumbnail: {
+      image: "image-dummy-2.png",
+      link: "https://app.box.com/s/xla8523hewputms10budz3emewcmor",
+      title: "2022kickoffmeeting | BOX",
+    },
+    interact: {
+      like: 141,
+      comment: 13,
+      share: 43,
+    },
+  },
+  {
+    userName: "yasuda",
+    avatar: "image-dummy.png",
+    note: "たった今",
+    title: "マーケティングで使えるHack",
     type: 0,
+    favorite: false,
     description:
       "良記事を見つけたのでシェア。 https://toyokeizai.net/articles/-/409835",
     thumbnail: {
